@@ -8,19 +8,25 @@
 
 import UIKit
 
-class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+class MemeMeViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
     // MARK: Outlets
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var topTextField: UITextField!
     @IBOutlet weak var bottomTextField: UITextField!
     @IBOutlet weak var cameraButton: UIBarButtonItem!
+    @IBOutlet weak var shareButton: UIBarButtonItem!
     
     
     
     // MARK: Private Properties
     private let strokeDelegate:StrokeTextFieldDelegate = StrokeTextFieldDelegate()
     
+    
+    
+    // MARK: Public static constants
+    public static let defaultTextToTopTextView:String = "TOP"
+    public static let defaultTextToBottomTextView:String = "BOTTOM"
     
     
     // MARK: Actions
@@ -32,7 +38,12 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         getImageFrom(.photoLibrary)
     }
     
+    @IBAction func shareTapped(_ sender: Any) {
+    }
     
+    @IBAction func cancelTapped(_ sender: Any) {
+        clearUI()
+    }
     
     // MARK: Override functions
     override func viewDidLoad() {
@@ -69,8 +80,23 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         topTextField.delegate = strokeDelegate
         bottomTextField.delegate = strokeDelegate
         
+        // Setting default texts
+        topTextField.text = MemeMeViewController.defaultTextToTopTextView
+        bottomTextField.text = MemeMeViewController.defaultTextToBottomTextView
+        
         // If there's no camera available, disable the button
         cameraButton.isEnabled = UIImagePickerController.isSourceTypeAvailable(.camera)
+        
+        // Share button only is enabled when meme is ready to share
+        shareButton.isEnabled = false
+    }
+    
+    // Clear all data in UI
+    private func clearUI(){
+        topTextField.text = ""
+        bottomTextField.text = ""
+        imageView.image = nil
+        shareButton.isEnabled = false
     }
     
     // Notification center function
@@ -117,6 +143,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     }
     
     
+    
     // MARK: Public functions
     // Image Picker Delegate Functions
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
@@ -128,6 +155,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
             imageView.image = image
         }
         dismiss(animated: true, completion: nil)
+        shareButton.isEnabled = true
     }
     
 }

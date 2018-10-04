@@ -10,44 +10,14 @@ import Foundation
 import UIKit
 
 class StrokeTextFieldDelegate: NSObject, UITextFieldDelegate {
-    func textFieldDidEndEditing(_ textField: UITextField) {
-        print("textFieldDidEndEditing")
-    }
-    
     func  textFieldDidBeginEditing(_ textField: UITextField) {
-        print("textFieldDidBeginEditing")
-        if textField.text == "TOP TEXT" || textField.text == "BOTTOM TEXT" {
+        if textField.text == MemeMeViewController.defaultTextToTopTextView || textField.text == MemeMeViewController.defaultTextToBottomTextView {
             textField.text = ""
         }
     }
     
-    func textFieldShouldClear(_ textField: UITextField) -> Bool {
-        print("textFieldShouldClear")
-        return true
-    }
-    
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        print("textFieldShouldClear")
         textField.resignFirstResponder()
-        return true
-    }
-    
-    func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
-        print("textFieldShouldEndEditing")
-        return true
-    }
-    
-    func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
-        print("textFieldShouldBeginEditing")
-        return true
-    }
-    
-    func textFieldDidEndEditing(_ textField: UITextField, reason: UITextField.DidEndEditingReason) {
-        print("textFieldDidEndEditing")
-    }
-    
-    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        print("textFieldshouldChangeCharactersInreplacementString")
         return true
     }
 }
