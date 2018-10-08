@@ -20,15 +20,8 @@ class MemeMeViewController: UIViewController, UIImagePickerControllerDelegate, U
     
     
     // MARK: Private constants
+    // Create delegate
     private let strokeDelegate:StrokeTextFieldDelegate = StrokeTextFieldDelegate()
-    private let strokeBorderWidth:Int = -4
-    
-    
-    
-    // MARK: Public static constants
-    public static let defaultTextToTopTextView:String = "TOP"
-    public static let defaultTextToBottomTextView:String = "BOTTOM"
-    
     
     // MARK: Actions
     @IBAction func cameraTapped(_ sender: Any) {
@@ -69,31 +62,36 @@ class MemeMeViewController: UIViewController, UIImagePickerControllerDelegate, U
     // Configure UI before show to user
     private func configureUI () {
         // TextFields
-        // Set stroke colors
-        let memeTextAttributes:[NSAttributedString.Key : Any] = [
-            NSAttributedString.Key.strokeColor: UIColor.black,
-            NSAttributedString.Key.strokeWidth: strokeBorderWidth]
-        // Update values to not lose values from storyboard
-        for attributeItem in memeTextAttributes {
-            topTextField.defaultTextAttributes.updateValue(attributeItem.value, forKey: attributeItem.key)
-            bottomTextField.defaultTextAttributes.updateValue(attributeItem.value, forKey: attributeItem.key)
-        }
-        // Setting delegates
-        topTextField.delegate = strokeDelegate
-        bottomTextField.delegate = strokeDelegate
-        
-        // Setting default texts
-        topTextField.text = MemeMeViewController.defaultTextToTopTextView
-        bottomTextField.text = MemeMeViewController.defaultTextToBottomTextView
+        setStyle(toTextField: bottomTextField)
+        setStyle(toTextField: topTextField)
         
         // If there's no camera available, disable the button
-//        cameraButton.isEnabled = UIImagePickerController.isSourceTypeAvailable(.camera)
+        cameraButton.isEnabled = UIImagePickerController.isSourceTypeAvailable(.camera)
         
         // Share button only is enabled when meme is ready to share
         shareButton.isEnabled = false
         
         // Toolbar is hidden by default. We need to show it!
         self.navigationController?.isToolbarHidden = false
+    }
+    
+    // Set style of textfields
+    func setStyle(toTextField textField: UITextField) {
+        // Create text attributes
+        let memeTextAttributes:[NSAttributedString.Key: Any] = [
+            NSAttributedString.Key(rawValue: NSAttributedString.Key.strokeColor.rawValue): UIColor.black,
+            NSAttributedString.Key(rawValue: NSAttributedString.Key.foregroundColor.rawValue): UIColor.white,
+            NSAttributedString.Key(rawValue: NSAttributedString.Key.font.rawValue): UIFont(name: "HelveticaNeue-CondensedBlack", size: 40)!,
+            NSAttributedString.Key(rawValue: NSAttributedString.Key.strokeWidth.rawValue): -4.0
+        ]
+        // Set attributes to text field
+        textField.defaultTextAttributes = memeTextAttributes
+        // Center textfield's text
+        textField.textAlignment = .center
+        // Capitalize all characters on textfield
+        textField.autocapitalizationType = .allCharacters
+        // Set delegate
+        textField.delegate = strokeDelegate
     }
     
     // Clear all data in UI
@@ -172,8 +170,8 @@ class MemeMeViewController: UIViewController, UIImagePickerControllerDelegate, U
     // Generate memed image
     private func generateMemedImage() -> UIImage {
         // Hide toolbar and navbar
-        self.navigationController?.isToolbarHidden = true
-        self.navigationController?.isNavigationBarHidden = true
+        hideBars(true)
+        hidePlaceholders(true)
         
         // Render view to an image
         UIGraphicsBeginImageContext(self.view.frame.size)
@@ -182,14 +180,33 @@ class MemeMeViewController: UIViewController, UIImagePickerControllerDelegate, U
         UIGraphicsEndImageContext()
         
         // Show toolbar and navbar
-        self.navigationController?.isToolbarHidden = false
-        self.navigationController?.isNavigationBarHidden = false
+        hideBars(false)
+        hidePlaceholders(false)
         
         return memedImage
     }
     
+    // Show/Hide bars
+    private func hideBars(_ hide:Bool) {
+        self.navigationController?.isToolbarHidden = hide
+        self.navigationController?.isNavigationBarHidden = hide
+    }
+    
+    // Revisor suggested me to use placeholder on textfields
+    // But this way, if the text is empty, placeholders appear at screenshots.
+    // So, I need to hide them like tool bars
+    private func hidePlaceholders (_ hide:Bool) {
+        if hide {
+            topTextField.placeholder = ""
+            bottomTextField.placeholder = ""
+        } else {
+            topTextField.placeholder = "TOP"
+            bottomTextField.placeholder = "BOTTOM"
+        }
+    }
+    
     // Save meme in model
-    func save(memedImage:UIImage) {
+    private func save(memedImage:UIImage) {
         let meme:Meme = Meme(topText: topTextField.text!, bottomText: bottomTextField.text!, originalImage: imageView.image!, memedImage: memedImage)
     }
     
