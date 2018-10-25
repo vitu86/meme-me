@@ -63,6 +63,7 @@ class MemeMeCollectionViewController: UIViewController, UICollectionViewDelegate
         
         var division:CGFloat = 0
         
+        // If device is in landscape mode, change the number of itens in screen
         if UIDevice.current.orientation.isLandscape {
             division = 6
         } else {
@@ -103,7 +104,7 @@ class MemeMeCollectionViewController: UIViewController, UICollectionViewDelegate
     
 }
 
+// As the collection view cell is not a complex one, I puted it in the same file.
 class MemeMeCollectionViewCell: UICollectionViewCell {
-    
     @IBOutlet weak var imageView: UIImageView!
 }

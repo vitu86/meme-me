@@ -64,6 +64,7 @@ class MemeMeTableViewController: UIViewController, UITableViewDataSource, UITabl
         let meme:Meme = memes[indexPath.row]
         
         cell.textLabel?.text = meme.topText + " " + meme.bottomText
+        // Put the middle of the text to get a (...) if it is too long
         cell.textLabel?.lineBreakMode = .byTruncatingMiddle
         cell.imageView?.image = meme.memedImage
         
@@ -74,6 +75,7 @@ class MemeMeTableViewController: UIViewController, UITableViewDataSource, UITabl
         performSegue(withIdentifier: "showDetail", sender: memes[indexPath.row])
     }
     
+    // Slide to delete function
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             memes.remove(at: indexPath.row)
