@@ -16,29 +16,14 @@ class MemeMeViewController: UIViewController, UIImagePickerControllerDelegate, U
     @IBOutlet weak var bottomTextField: UITextField!
     @IBOutlet weak var cameraButton: UIBarButtonItem!
     @IBOutlet weak var shareButton: UIBarButtonItem!
+    @IBOutlet weak var navBar: UINavigationBar!
+    @IBOutlet weak var toolBar: UIToolbar!
     
     
     
     // MARK: Private constants
     // Create delegate
     private let strokeDelegate:StrokeTextFieldDelegate = StrokeTextFieldDelegate()
-    
-    // MARK: Actions
-    @IBAction func cameraTapped(_ sender: Any) {
-        getImageFrom(.camera)
-    }
-    
-    @IBAction func albumTapped(_ sender: Any) {
-        getImageFrom(.photoLibrary)
-    }
-    
-    @IBAction func shareTapped(_ sender: Any) {
-        shareLogic()
-    }
-    
-    @IBAction func cancelTapped(_ sender: Any) {
-        clearUI()
-    }
     
     // MARK: Override functions
     override func viewDidLoad() {
@@ -56,7 +41,26 @@ class MemeMeViewController: UIViewController, UIImagePickerControllerDelegate, U
         unsubscribeFromKeyboardNotifications()
     }
     
+    // MARK: Actions
+    @IBAction func cameraTapped(_ sender: Any) {
+        getImageFrom(.camera)
+    }
     
+    @IBAction func albumTapped(_ sender: Any) {
+        getImageFrom(.photoLibrary)
+    }
+    
+    @IBAction func shareTapped(_ sender: Any) {
+        shareLogic()
+    }
+    
+    @IBAction func cancelTapped(_ sender: Any) {
+        dismiss(animated: true, completion: nil)
+    }
+    
+    @IBAction func clearTapped(_ sender: Any) {
+        clearUI()
+    }
     
     // MARK: Private functions
     // Configure UI before show to user
@@ -70,9 +74,6 @@ class MemeMeViewController: UIViewController, UIImagePickerControllerDelegate, U
         
         // Share button only is enabled when meme is ready to share
         shareButton.isEnabled = false
-        
-        // Toolbar is hidden by default. We need to show it!
-        self.navigationController?.isToolbarHidden = false
     }
     
     // Set style of textfields
@@ -110,8 +111,7 @@ class MemeMeViewController: UIViewController, UIImagePickerControllerDelegate, U
     
     // Notification center function
     private func unsubscribeFromKeyboardNotifications() {
-        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
+        NotificationCenter.default.removeObserver(self)
     }
     
     // Get keyboard height to put view up
@@ -146,7 +146,7 @@ class MemeMeViewController: UIViewController, UIImagePickerControllerDelegate, U
     }
     
     // Share button logic
-    func shareLogic(){
+    private func shareLogic(){
         // Generate memed image
         let memedImage:UIImage = generateMemedImage()
         // Prepare activity view controller to share
@@ -157,6 +157,7 @@ class MemeMeViewController: UIViewController, UIImagePickerControllerDelegate, U
             if completed {
                 self.save(memedImage: memedImage)
                 self.clearUI()
+                self.dismiss(animated: true, completion: nil)
             }
         }
         
@@ -188,28 +189,27 @@ class MemeMeViewController: UIViewController, UIImagePickerControllerDelegate, U
     
     // Show/Hide bars
     private func hideBars(_ hide:Bool) {
-        self.navigationController?.isToolbarHidden = hide
-        self.navigationController?.isNavigationBarHidden = hide
+        navBar.isHidden = hide
+        toolBar.isHidden = hide
     }
     
     // Revisor suggested me to use placeholder on textfields
     // But this way, if the text is empty, placeholders appear at screenshots.
     // So, I need to hide them like tool bars
     private func hidePlaceholders (_ hide:Bool) {
-        if hide {
-            topTextField.placeholder = ""
-            bottomTextField.placeholder = ""
-        } else {
-            topTextField.placeholder = "TOP"
-            bottomTextField.placeholder = "BOTTOM"
-        }
+        topTextField.placeholder = hide ? "" : "TOP"
+        bottomTextField.placeholder = hide ? "" : "BOTTOM"
     }
     
     // Save meme in model
     private func save(memedImage:UIImage) {
+        // Create the meme object
         let meme:Meme = Meme(topText: topTextField.text!, bottomText: bottomTextField.text!, originalImage: imageView.image!, memedImage: memedImage)
-    }
-    
+        
+        // Save in shared data model
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        appDelegate.memes.append(meme)
+    }    
     
     // MARK: Public functions
     // MARK: Image Picker Delegate Functions
